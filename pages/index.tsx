@@ -1,11 +1,22 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
+import { TheBox } from "@decent.xyz/the-box";
+import { useConnect } from 'wagmi'
+
+// Get the signer and address via wagmi or configure using ethers
+import { useSigner, useAccount } from 'wagmi';
+import { ethers } from 'ethers';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
+
+  const { data: signer } = useSigner();
+  const { address: account } = useAccount();
+  console.log({ signer, account });
+
   return (
     <>
       <Head>
@@ -15,108 +26,53 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+        <div>
+          {connectors.map((connector) => (
+            <button
+              disabled={!connector.ready}
+              key={connector.id}
+              onClick={() => connect({ connector })}
             >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
+              {connector.name}
+              {!connector.ready && ' (unsupported)'}
+              {isLoading &&
+                connector.id === pendingConnector?.id &&
+                ' (connecting)'}
+            </button>
+          ))}
+
+          {error && <div>{error.message}</div>}
         </div>
 
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+        <TheBox
+          className="rounded-lg border shadow-md bg-white"
+          signer={signer || null}
+          nftParams={{
+            address: "0x3007E0eB44222AC69E1D3c93A9e50F9CA73F53a1",
+            chainId: 42161,
+            paymentToken: ethers.constants.AddressZero,
+            mintParams: {
+              abi: "function mint(address to,uint256 numberOfTokens) payable",
+              params: [account, 1],
+              cost: ethers.utils.parseEther("0.00005"),
+              endSupply: {
+                maxCap: 500,
+              },
+            },
+            title: "Autumn",
+            displayCost: "0.0005 ETH"
+          }}
+          options={{
+            allowSecondary: true,
+            allowPrimary: true,
+            allowBridging: true,
+            allowSwapping: true
+          }}
+          onTxError={() => console.log("Rugged. Blame Elon.")}
+          onTxPending={() => console.log("Box is fast so this should be qui")}
+          onTxReceipt={() => console.log("Sweet receipt.")}
+          apiKey={process.env.NEXT_PUBLIC_DECENT_API_KEY}
+        />
       </main>
     </>
   )
