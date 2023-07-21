@@ -1,21 +1,22 @@
-import Head from 'next/head'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-import { TheBox } from "@decent.xyz/the-box";
-import { useConnect } from 'wagmi'
+import { TheBox } from '@decent.xyz/the-box';
+import '@decent.xyz/the-box/dist/font.woff2.css';
+import '@decent.xyz/the-box/dist/light.css';
+import styles from '@/styles/Home.module.css';
+import Head from 'next/head';
+import { useConnect } from 'wagmi';
 
 // Get the signer and address via wagmi or configure using ethers
 import { useSigner, useAccount } from 'wagmi';
 import { ethers } from 'ethers';
 
-const inter = Inter({ subsets: ['latin'] })
-
 export default function Home() {
-  const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
+  const { connect, connectors, error, isLoading, pendingConnector } =
+    useConnect();
 
   const { data: signer } = useSigner();
   const { address: account } = useAccount();
   console.log({ signer, account });
+  console.log(process.env.NEXT_PUBLIC_DECENT_API_KEY);
 
   return (
     <>
@@ -45,35 +46,39 @@ export default function Home() {
         </div>
 
         <TheBox
-          className="rounded-lg border shadow-md bg-white"
+          className="rounded-lg border shadow-md bg-white light"
           signer={signer || null}
           nftParams={{
-            address: "0x3007E0eB44222AC69E1D3c93A9e50F9CA73F53a1",
-            chainId: 42161,
-            paymentToken: ethers.constants.AddressZero,
+            address: '0xdd45d5095567f5CD681918251195deDfa84B6b93',
+            chainId: 137,
+            // paymentToken: ethers.constants.AddressZero,
             mintParams: {
-              abi: "function mint(address to,uint256 numberOfTokens) payable",
-              params: [account, 1],
-              cost: ethers.utils.parseEther("0.00005"),
+              abi: 'function mint(bytes32 r,bytes32 s,uint8 v) payable',
+              params: [
+                '0xe5c34e3172070331fe240b4cffef5817cfacba2ec3821a3cbfbb2f7b0e128198',
+                '0x41e593e34ba4c9768309f023a5a165a6d9b7c6aeebf0f4d3910d951731e73edc',
+                28,
+              ],
+              cost: ethers.utils.parseEther('0.75'),
               endSupply: {
-                maxCap: 500,
+                maxCap: 10,
               },
             },
-            title: "Autumn",
-            displayCost: "0.0005 ETH"
+            title: 'test box polygon pay on arb',
+            displayCost: '0.75 MATIC',
           }}
           options={{
             allowSecondary: true,
             allowPrimary: true,
             allowBridging: true,
-            allowSwapping: true
+            allowSwapping: true,
           }}
-          onTxError={() => console.log("Rugged. Blame Elon.")}
-          onTxPending={() => console.log("Box is fast so this should be qui")}
-          onTxReceipt={() => console.log("Sweet receipt.")}
+          onTxError={() => console.log('Rugged. Blame Elon.')}
+          onTxPending={() => console.log('Box is fast so this should be qui')}
+          onTxReceipt={() => console.log('Sweet receipt.')}
           apiKey={process.env.NEXT_PUBLIC_DECENT_API_KEY}
         />
       </main>
     </>
-  )
+  );
 }

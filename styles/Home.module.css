@@ -6,7 +6,7 @@
   padding: 6rem;
   min-height: 100vh;
   background: rgb(68,249,183);
-  background: linear-gradient(90deg, rgba(68,249,183,1) 0%, rgba(0,212,255,1) 100%)
+  background: linear-gradient(90deg, rgba(58, 128, 179, 0.55) 0%, rgb(17, 193, 228) 100%)
 }
 
 .description {
