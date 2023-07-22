@@ -41,8 +41,9 @@ export default function Home() {
                 ' (connecting)'}
             </button>
           ))}
-
           {error && <div>{error.message}</div>}
+          <br />
+          connected account: {account && <div>{account}</div>}
         </div>
 
         <TheBox
