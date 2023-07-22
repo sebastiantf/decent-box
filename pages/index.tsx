@@ -15,8 +15,8 @@ export default function Home() {
 
   const { data: signer } = useSigner();
   const { address: account } = useAccount();
-  console.log({ signer, account });
-  console.log(process.env.NEXT_PUBLIC_DECENT_API_KEY);
+  console.log('signer, account: ', { signer, account });
+  console.log('api_key: ', process.env.NEXT_PUBLIC_DECENT_API_KEY);
 
   return (
     <>
